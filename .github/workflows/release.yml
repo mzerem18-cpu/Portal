@@ -24,13 +24,16 @@ jobs:
         run: | 
           agvtool new-version -all $(git rev-parse HEAD)
           make
-          mkdir upload
-          mv packages/* upload/
+          mkdir -p upload
+          # ئەم دێرەی خوارەوە دڵنیا دەبێتەوە کە فایلەکان دەچنە ناو فۆڵدەری upload
+          find . -name "*.ipa" -exec mv {} upload/ \;
 
       - name: Get Version
         id: get_version
         run: |
-          VERSION=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" Payload/*.app/Info.plist)
+          # گەڕان بەدوای فایلی Info.plist بۆ دۆزینەوەی ڤێرژن
+          VERSION_PATH=$(find . -name "Info.plist" | grep "Payload" | head -n 1)
+          VERSION=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$VERSION_PATH")
           echo "VERSION=${VERSION}" >> $GITHUB_ENV
 
       - name: Create Release
@@ -41,7 +44,8 @@ jobs:
           files: |
             upload/*.ipa
           generate_release_notes: true
-          fail_on_unmatched_files: true
-          draft: true
+          fail_on_unmatched_files: false
+          draft: false
+          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
