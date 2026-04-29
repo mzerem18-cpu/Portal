@@ -104,7 +104,7 @@ struct SourcesAddView: View {
                     
                     // Footer Links
                     VStack(spacing: 8) {
-                        Link(String.localized("Learn more about repositories..."), destination: URL(string: "https://t.me/ashtemobile")!)
+                        Link(String.localized("Telegram..."), destination: URL(string: "https://t.me/ashtemobile")!)
                             .font(.footnote)
                         
                         Text(.localized("Want to be featured? Contact us on Telegram."))
