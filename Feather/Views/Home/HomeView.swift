@@ -96,7 +96,6 @@ struct HomeView: View {
         }
     }
 
-    // MARK: - Notification Logic
     private func showDownloadNotification(for app: HomeApp) {
         self.downloadedApp = app
         withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
@@ -129,7 +128,7 @@ struct HomeView: View {
                 .font(.title2)
         }
         .padding()
-        .background(VisualEffectBlur(blurStyle: .systemUltraThinMaterial))
+        .background(.ultraThinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
         .shadow(color: Color.black.opacity(0.15), radius: 20, x: 0, y: 10)
         .padding(.horizontal)
@@ -144,96 +143,4 @@ struct HomeView: View {
             await MainActor.run { self.apps = decoded }
         } catch { print("Error: \(error)") }
     }
-}
-
-// MARK: - Featured Hero Card
-struct FeaturedHeroCard: View {
-    let app: HomeApp
-    @ObservedObject var downloadManager: DownloadManager
-    var onDownloadComplete: () -> Void
-
-    var body: some View {
-        ZStack(alignment: .bottom) {
-            AsyncImage(url: app.fullBannerURL) { image in
-                image.resizable().scaledToFill()
-            } placeholder: { Color.blue.opacity(0.1) }
-            .frame(width: UIScreen.main.bounds.width - 40, height: 300)
-            .clipShape(RoundedRectangle(cornerRadius: 30, style: .continuous))
-            
-            // Glossy Overlay
-            VStack(alignment: .leading, spacing: 8) {
-                HStack(alignment: .center) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(app.status?.uppercased() ?? "NEW")
-                            .font(.system(size: 10, weight: .black))
-                            .foregroundColor(.blue)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .background(Color.white)
-                            .clipShape(Capsule())
-                        
-                        Text(app.name)
-                            .font(.title2.bold())
-                            .foregroundColor(.white)
-                        
-                        Text(app.developer ?? "AshteMobile")
-                            .font(.subheadline)
-                            .foregroundColor(.white.opacity(0.8))
-                    }
-                    Spacer()
-                    HomeDownloadButtonView(app: app, downloadManager: downloadManager, onDownloadComplete: onDownloadComplete)
-                        .background(Circle().fill(.ultraThinMaterial))
-                        .scaleEffect(1.2)
-                }
-            }
-            .padding(25)
-            .background(
-                LinearGradient(colors: [.clear, .black.opacity(0.8)], startPoint: .top, endPoint: .bottom)
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 30, style: .continuous))
-        }
-        .padding(.horizontal, 20)
-        .shadow(color: Color.black.opacity(0.2), radius: 15, x: 0, y: 10)
-    }
-}
-
-// MARK: - Modern App Card
-struct ModernAppCard: View {
-    let app: HomeApp
-    @ObservedObject var downloadManager: DownloadManager
-    var onDownloadComplete: () -> Void
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            AsyncImage(url: app.fullImageURL) { image in
-                image.resizable().scaledToFill()
-            } placeholder: { Color.gray.opacity(0.1) }
-            .frame(width: 120, height: 120)
-            .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
-            .shadow(color: Color.black.opacity(0.1), radius: 8, x: 0, y: 4)
-            
-            VStack(alignment: .leading, spacing: 2) {
-                Text(app.name)
-                    .font(.system(size: 15, weight: .bold, design: .rounded))
-                    .foregroundColor(.primary)
-                    .lineLimit(1)
-                
-                Text(app.category ?? "App")
-                    .font(.system(size: 12))
-                    .foregroundColor(.secondary)
-            }
-            
-            HomeDownloadButtonView(app: app, downloadManager: downloadManager, onDownloadComplete: onDownloadComplete)
-        }
-        .frame(width: 120)
-    }
-}
-
-// MARK: - Blur Helper
-struct VisualEffectBlur: UIViewRepresentable {
-    var blurStyle: UIBlurEffect.Style
-    func makeUIView(context: Context) -> UIVisualEffectView {
-        UIVisualEffectView(effect: UIBlurEffect(style: blurStyle))
-    }
-    func updateUIView(_ uiView: UIVisualEffectView, context: Context) {}
 }
