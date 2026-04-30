@@ -1,6 +1,8 @@
 import SwiftUI
 import NimbleViews
 import UIKit
+import Darwin
+import IDeviceSwift
 
 // MARK: - View
 struct SettingsView: View {
@@ -28,47 +30,62 @@ struct SettingsView: View {
     var body: some View {
         NBNavigationView(.localized("Settings")) {
             Form {
-                // MARK: - Header (Logo & Brand)
+                // MARK: - Modern Header (Logo & Social)
                 Section {
-                    VStack(spacing: 12) {
+                    VStack(spacing: 15) {
                         AsyncImage(url: URL(string: "https://ashtemobile.tututweak.com/a.png")) { image in
                             image.resizable()
                                 .scaledToFit()
-                                .frame(width: 90, height: 90)
-                                .clipShape(RoundedRectangle(cornerRadius: 20))
-                                .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 5)
+                                .frame(width: 85, height: 85)
+                                .clipShape(RoundedRectangle(cornerRadius: 18))
+                                .shadow(radius: 5)
                         } placeholder: {
-                            RoundedRectangle(cornerRadius: 20)
-                                .fill(Color.gray.opacity(0.1))
-                                .frame(width: 90, height: 90)
-                                .overlay(ProgressView())
+                            ProgressView()
                         }
                         
                         Text("AshteMobile")
-                            .font(.system(size: 24, weight: .bold, design: .rounded))
+                            .font(.system(size: 22, weight: .bold, design: .rounded))
                         
-                        HStack(spacing: 15) {
-                            // Telegram
-                            Link(destination: URL(string: "https://t.me/ashtemobile")!) {
-                                SocialIcon(image: "paperplane.fill", color: .blue)
+                        HStack(spacing: 20) {
+                            // Telegram Button
+                            Button(action: {
+                                if let url = URL(string: "https://t.me/ashtemobile") {
+                                    UIApplication.shared.open(url)
+                                }
+                            }) {
+                                Image(systemName: "paperplane.fill")
+                                    .foregroundColor(.white)
+                                    .padding(10)
+                                    .background(Circle().fill(Color.blue))
                             }
                             
-                            // Instagram
-                            Link(destination: URL(string: "https://www.instagram.com/ashtemobile")!) {
-                                SocialIcon(image: "camera.fill", color: .pink)
+                            // Instagram Button
+                            Button(action: {
+                                if let url = URL(string: "https://www.instagram.com/ashtemobile") {
+                                    UIApplication.shared.open(url)
+                                }
+                            }) {
+                                Image(systemName: "camera.fill")
+                                    .foregroundColor(.white)
+                                    .padding(10)
+                                    .background(Circle().fill(Color.pink))
                             }
                         }
+                        .buttonStyle(PlainButtonStyle())
                     }
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 15)
+                    .padding(.vertical, 10)
                 }
                 .listRowBackground(Color.clear)
 
-                // MARK: - General
-                NBSection(.localized("General")) {
+                // MARK: - About & Appearance
+                Section {
                     NavigationLink(destination: AboutView()) {
-                        Label(.localized("About"), systemImage: "info.circle.fill")
-                            .foregroundColor(.blue)
+                        Label {
+                            Text(verbatim: .localized("About %@", arguments: Bundle.main.name))
+                        } icon: {
+                            FRAppIconView(size: 23)
+                        }
                     }
                     NavigationLink(destination: AppearanceView()) {
                         Label(.localized("Appearance"), systemImage: "paintbrush.fill")
@@ -76,7 +93,7 @@ struct SettingsView: View {
                     }
                     NavigationLink(destination: AppIconView(currentIcon: $_currentIcon)) {
                         Label(.localized("App Icon"), systemImage: "app.badge.fill")
-                            .foregroundColor(.orange)
+                            .foregroundColor(.blue)
                     }
                 }
                 
@@ -85,48 +102,58 @@ struct SettingsView: View {
                     if let cert = selectedCertificate {
                         CertificatesCellView(cert: cert)
                     } else {
-                        Text(.localized("No Certificate Selected"))
+                        Text(.localized("No Certificate"))
                             .font(.footnote)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(.disabled())
                     }
                     NavigationLink(destination: CertificatesView()) {
                         Label(.localized("Manage Certificates"), systemImage: "checkmark.seal.fill")
                             .foregroundColor(.green)
                     }
+                } footer: {
+                    Text(.localized("Add and manage certificates used for signing applications."))
                 }
                 
-                // MARK: - App Features
+                // MARK: - Features
                 NBSection(.localized("Features")) {
                     NavigationLink(destination: ConfigurationView()) {
                         Label(.localized("Signing Options"), systemImage: "signature")
-                            .foregroundColor(.cyan)
-                    }
-                    NavigationLink(destination: InstallationView()) {
-                        Label(.localized("Installation"), systemImage: "arrow.down.circle.fill")
-                            .foregroundColor(.indigo)
+                            .foregroundColor(.orange)
                     }
                     NavigationLink(destination: ArchiveView()) {
                         Label(.localized("Archive & Compression"), systemImage: "archivebox.fill")
                             .foregroundColor(.brown)
                     }
+                    NavigationLink(destination: InstallationView()) {
+                        Label(.localized("Installation"), systemImage: "arrow.down.circle.fill")
+                            .foregroundColor(.blue)
+                    }
+                } footer: {
+                    Text(.localized("Configure the apps way of installing, its zip compression levels, and custom modifications to apps."))
                 }
                 
-                // MARK: - Files & Storage
-                NBSection(.localized("Storage")) {
+                // MARK: - Directories
+                NBSection(.localized("Misc")) {
                     Button {
                         UIApplication.open(URL.documentsDirectory.toSharedDocumentsURL()!)
                     } label: {
-                        Label(.localized("Documents"), systemImage: "folder.fill")
+                        Label(.localized("Open Documents"), systemImage: "folder.fill")
+                    }
+                    
+                    Button {
+                        UIApplication.open(FileManager.default.archives.toSharedDocumentsURL()!)
+                    } label: {
+                        Label(.localized("Open Archives"), systemImage: "archivebox.fill")
                     }
                     
                     Button {
                         UIApplication.open(FileManager.default.certificates.toSharedDocumentsURL()!)
                     } label: {
-                        Label(.localized("Certificates Folder"), systemImage: "lock.folder.fill")
+                        Label(.localized("Open Certificates"), systemImage: "lock.folder.fill")
                     }
                 }
                 
-                // MARK: - Danger Zone
+                // MARK: - Reset
                 Section {
                     NavigationLink(destination: ResetView()) {
                         Label(.localized("Reset All Data"), systemImage: "trash.fill")
@@ -135,21 +162,5 @@ struct SettingsView: View {
                 }
             }
         }
-    }
-}
-
-// MARK: - Helper View for Social Buttons
-struct SocialIcon: View {
-    let image: String
-    let color: Color
-    
-    var body: some View {
-        Image(systemName: image)
-            .font(.system(size: 16, weight: .bold))
-            .foregroundColor(.white)
-            .frame(width: 38, height: 38)
-            .background(color)
-            .clipShape(Circle())
-            .shadow(color: color.opacity(0.3), radius: 5, x: 0, y: 3)
     }
 }
