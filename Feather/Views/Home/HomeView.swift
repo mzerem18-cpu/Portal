@@ -4,7 +4,7 @@
 //
 
 import SwiftUI
-import NimbleViews // پێویستە ئەمە لای خۆت هەبێت وەکو پێشتر
+import NimbleViews
 import Foundation
 import UIKit
 
@@ -55,9 +55,21 @@ struct HomeView: View {
     
     var body: some View {
         ZStack(alignment: .top) {
-            NBNavigationView("Home") {
+            // پاشبنەمایەکی مۆدێرن و درەوشاوە
+            Color(UIColor.systemBackground).ignoresSafeArea()
+            
+            GeometryReader { proxy in
+                Circle()
+                    .fill(LinearGradient(colors: [.blue.opacity(0.15), .purple.opacity(0.15)], startPoint: .topLeading, endPoint: .bottomTrailing))
+                    .frame(width: proxy.size.width * 1.5, height: proxy.size.width * 1.5)
+                    .blur(radius: 60)
+                    .offset(x: -proxy.size.width * 0.2, y: -proxy.size.width * 0.5)
+            }
+            .ignoresSafeArea()
+            
+            NBNavigationView("Discover") { // گۆڕینی ناو بۆ دیزاینێکی مۆدێرنتر
                 ScrollView {
-                    VStack(spacing: 35) { // مەودای نێوان بەشەکانم زیاتر کردووە بۆ جوانی
+                    VStack(spacing: 40) {
                         
                         // Featured Section
                         if !featuredApps.isEmpty {
@@ -73,22 +85,23 @@ struct HomeView: View {
                                     .buttonStyle(.plain)
                                 }
                             }
-                            .frame(height: 260) // کەمێک گەورەتر بۆ وێنەی باکگراوەند
+                            .frame(height: 280)
                             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .always))
                         }
                         
                         // Categories Section
                         VStack(alignment: .leading, spacing: 35) {
                             ForEach(groupedApps, id: \.0) { category, categoryApps in
-                                VStack(alignment: .leading, spacing: 18) {
-                                    HStack {
+                                VStack(alignment: .leading, spacing: 20) {
+                                    HStack(alignment: .lastTextBaseline) {
                                         Text(category)
-                                            .font(.system(.title2, design: .rounded).bold())
+                                            .font(.system(size: 24, weight: .bold, design: .rounded))
                                         Spacer()
-                                        Image(systemName: "chevron.right")
-                                            .foregroundColor(.gray.opacity(0.5))
+                                        Text("See All")
+                                            .font(.system(size: 15, weight: .semibold, design: .rounded))
+                                            .foregroundColor(.blue)
                                     }
-                                    .padding(.horizontal, 20)
+                                    .padding(.horizontal, 24)
                                     
                                     ScrollView(.horizontal, showsIndicators: false) {
                                         LazyHStack(spacing: 20) {
@@ -103,18 +116,19 @@ struct HomeView: View {
                                                 .buttonStyle(.plain)
                                             }
                                         }
-                                        .padding(.horizontal, 20)
-                                        .padding(.vertical, 10)
+                                        .padding(.horizontal, 24)
+                                        .padding(.bottom, 20)
+                                        .padding(.top, 5)
                                     }
                                 }
                             }
                         }
                         
                         SocialMediaFooter()
-                            .padding(.top, 15)
-                            .padding(.bottom, 40)
+                            .padding(.top, 10)
+                            .padding(.bottom, 50)
                     }
-                    .padding(.top, 15)
+                    .padding(.top, 20)
                 }
                 .refreshable {
                     await loadApps()
@@ -124,13 +138,14 @@ struct HomeView: View {
                 Task { await loadApps() }
             }
             
-            // Modern Notification Banner
+            // Premium Notification Banner
             if showNotification, let app = downloadedApp {
                 notificationBanner(for: app)
                     .padding(.top, safeAreaTop() + 10)
                     .zIndex(100)
             }
         }
+        .preferredColorScheme(.dark) // یارمەتیدەرە بۆ ئەوەی دیزاینەکە مۆدێرنتر دەربکەوێت بە شێوازی تاریک
     }
     
     private func showDownloadNotification(for app: HomeApp) {
@@ -147,37 +162,41 @@ struct HomeView: View {
     
     @ViewBuilder
     private func notificationBanner(for app: HomeApp) -> some View {
-        HStack(alignment: .center, spacing: 15) {
+        HStack(alignment: .center, spacing: 16) {
             AsyncImage(url: app.fullImageURL) { image in
                 image.resizable().aspectRatio(contentMode: .fill)
             } placeholder: {
-                Color.gray.opacity(0.2)
+                Color.gray.opacity(0.3)
             }
-            .frame(width: 45, height: 45)
-            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .frame(width: 48, height: 48)
+            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
             
             VStack(alignment: .leading, spacing: 4) {
-                Text("Downloaded")
-                    .font(.system(.subheadline, design: .rounded).bold())
+                Text("Ready to Install")
+                    .font(.system(size: 16, weight: .bold, design: .rounded))
                     .foregroundColor(.primary)
-                Text("\(app.name) is ready in your library.")
-                    .font(.system(.caption, design: .rounded))
+                Text("\(app.name) has been added.")
+                    .font(.system(size: 13, weight: .medium, design: .rounded))
                     .foregroundColor(.secondary)
-                    .lineLimit(1)
             }
             
             Spacer()
             
-            Image(systemName: "checkmark.circle.fill")
-                .foregroundColor(.green)
-                .font(.title2)
+            Image(systemName: "checkmark.seal.fill")
+                .foregroundColor(.blue)
+                .font(.system(size: 26))
+                .symbolRenderingMode(.multicolor)
         }
-        .padding(12)
-        .background(.ultraThinMaterial) // دیزاینی شوشەیی (Glassmorphism)
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .shadow(color: Color.black.opacity(0.1), radius: 20, x: 0, y: 10)
+        .padding(14)
+        .background(.ultraThinMaterial)
+        .overlay(
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .stroke(Color.white.opacity(0.15), lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .shadow(color: Color.black.opacity(0.2), radius: 25, x: 0, y: 15)
         .padding(.horizontal, 20)
-        .transition(.move(edge: .top).combined(with: .opacity).combined(with: .scale(scale: 0.9)))
+        .transition(.asymmetric(insertion: .move(edge: .top).combined(with: .opacity), removal: .opacity.combined(with: .scale(scale: 0.9))))
     }
     
     private func loadApps() async {
@@ -214,154 +233,165 @@ struct HomeAppDetailView: View {
     @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 0) {
-                
-                // Hero Image with Parallax effect
-                GeometryReader { proxy in
-                    let minY = proxy.frame(in: .global).minY
-                    let isScrolledDown = minY > 0
-                    let height = isScrolledDown ? 280 + minY : 280
-                    let offset = isScrolledDown ? -minY : 0
+        ZStack {
+            Color(UIColor.systemBackground).ignoresSafeArea()
+            
+            ScrollView {
+                VStack(alignment: .leading, spacing: 0) {
+                    
+                    // Cinematic Hero Header
+                    GeometryReader { proxy in
+                        let minY = proxy.frame(in: .global).minY
+                        let isScrolledDown = minY > 0
+                        let height = isScrolledDown ? 320 + minY : 320
+                        let offset = isScrolledDown ? -minY : 0
 
-                    ZStack(alignment: .top) {
+                        ZStack(alignment: .top) {
+                            AsyncImage(url: app.fullImageURL) { image in
+                                image.resizable().aspectRatio(contentMode: .fill)
+                            } placeholder: {
+                                Color.gray.opacity(0.2)
+                            }
+                            .frame(width: proxy.size.width, height: height)
+                            .clipped()
+                            .overlay(
+                                LinearGradient(colors: [.clear, Color(UIColor.systemBackground)], startPoint: .center, endPoint: .bottom)
+                            )
+                            .offset(y: offset)
+                            
+                            // Navigation Buttons
+                            HStack {
+                                Button(action: { presentationMode.wrappedValue.dismiss() }) {
+                                    Image(systemName: "chevron.left")
+                                        .font(.system(size: 18, weight: .bold))
+                                        .foregroundColor(.white)
+                                        .frame(width: 44, height: 44)
+                                        .background(.ultraThinMaterial)
+                                        .environment(\.colorScheme, .dark)
+                                        .clipShape(Circle())
+                                }
+                                Spacer()
+                                
+                                Button(action: {
+                                    let shareText = "Download \(app.name) from AshteMobile Store!\nhttps://t.me/ashtemmobile"
+                                    let av = UIActivityViewController(activityItems: [shareText], applicationActivities: nil)
+                                    UIApplication.shared.windows.first?.rootViewController?.present(av, animated: true, completion: nil)
+                                }) {
+                                    Image(systemName: "square.and.arrow.up")
+                                        .font(.system(size: 18, weight: .bold))
+                                        .foregroundColor(.white)
+                                        .frame(width: 44, height: 44)
+                                        .background(.ultraThinMaterial)
+                                        .environment(\.colorScheme, .dark)
+                                        .clipShape(Circle())
+                                }
+                            }
+                            .padding(.horizontal, 24)
+                            .padding(.top, safeAreaTop() + 10)
+                        }
+                    }
+                    .frame(height: 320)
+                    
+                    // App Info Header (Floating Effect)
+                    HStack(alignment: .center, spacing: 20) {
                         AsyncImage(url: app.fullImageURL) { image in
                             image.resizable().aspectRatio(contentMode: .fill)
                         } placeholder: {
                             Color.gray.opacity(0.2)
                         }
-                        .frame(width: proxy.size.width, height: height)
-                        .clipped()
-                        .blur(radius: isScrolledDown ? 0 : 30) // مۆدێرنتر
-                        .overlay(Color.black.opacity(0.2))
-                        .offset(y: offset)
+                        .frame(width: 120, height: 120)
+                        .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                                .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                        )
+                        .shadow(color: Color.black.opacity(0.3), radius: 20, x: 0, y: 10)
                         
-                        // Glassmorphism Buttons
-                        HStack {
-                            Button(action: { presentationMode.wrappedValue.dismiss() }) {
-                                Image(systemName: "xmark")
-                                    .font(.system(size: 16, weight: .bold))
-                                    .foregroundColor(.primary)
-                                    .frame(width: 38, height: 38)
-                                    .background(.ultraThinMaterial)
-                                    .clipShape(Circle())
-                            }
-                            Spacer()
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text(app.name)
+                                .font(.system(size: 26, weight: .bold, design: .rounded))
+                                .foregroundColor(.primary)
                             
-                            Button(action: {
-                                let shareText = "Download \(app.name) from AshteMobile Store!\nhttps://t.me/ashtemmobile"
-                                let av = UIActivityViewController(activityItems: [shareText], applicationActivities: nil)
-                                UIApplication.shared.windows.first?.rootViewController?.present(av, animated: true, completion: nil)
-                            }) {
-                                Image(systemName: "square.and.arrow.up")
-                                    .font(.system(size: 16, weight: .bold))
-                                    .foregroundColor(.primary)
-                                    .frame(width: 38, height: 38)
-                                    .background(.ultraThinMaterial)
-                                    .clipShape(Circle())
-                            }
-                        }
-                        .padding(.horizontal, 20)
-                        .padding(.top, safeAreaTop() + 10)
-                    }
-                }
-                .frame(height: 280)
-                
-                // App Header Info
-                HStack(alignment: .bottom, spacing: 20) {
-                    AsyncImage(url: app.fullImageURL) { image in
-                        image.resizable().aspectRatio(contentMode: .fill)
-                    } placeholder: {
-                        Color.gray.opacity(0.2)
-                    }
-                    .frame(width: 115, height: 115)
-                    .clipShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 26, style: .continuous)
-                            .stroke(Color.white.opacity(0.2), lineWidth: 1)
-                    )
-                    .shadow(color: Color.black.opacity(0.12), radius: 15, x: 0, y: 8)
-                    
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text(app.name)
-                            .font(.system(.title2, design: .rounded).bold())
-                            .foregroundColor(.primary)
-                        
-                        Text(app.category ?? "Utilities")
-                            .font(.system(.subheadline, design: .rounded))
-                            .foregroundColor(.secondary)
-                        
-                        HomeDownloadButtonView(app: app, downloadManager: downloadManager, onDownloadComplete: onDownloadComplete)
-                            .frame(width: 90)
-                            .padding(.top, 5)
-                    }
-                    .padding(.bottom, 5)
-                }
-                .padding(.horizontal, 20)
-                .offset(y: -40)
-                .padding(.bottom, -20)
-                
-                // Stats Row
-                HStack(spacing: 15) {
-                    StatCard(icon: "tag.fill", title: "Version", value: app.version ?? "1.0", color: .blue)
-                    StatCard(icon: "shippingbox.fill", title: "Size", value: app.size ?? "Unknown", color: .purple)
-                }
-                .padding(.horizontal, 20)
-                .padding(.bottom, 30)
-                
-                // Description Section
-                VStack(alignment: .leading, spacing: 15) {
-                    Text("Description")
-                        .font(.system(.title3, design: .rounded).bold())
-                    
-                    VStack(alignment: .leading, spacing: 10) {
-                        if let hacks = app.hack, !hacks.isEmpty {
-                            ForEach(hacks, id: \.self) { hack in
-                                HStack(alignment: .top, spacing: 10) {
-                                    Image(systemName: "sparkles")
-                                        .foregroundColor(.yellow)
-                                        .font(.system(size: 14))
-                                        .padding(.top, 2)
-                                    Text(hack)
-                                        .font(.system(.body, design: .rounded))
-                                        .foregroundColor(.secondary)
-                                }
-                            }
-                        } else {
-                            Text("Download \(app.name) now and enjoy smooth performance and regular updates directly from the AshteMobile Store.")
-                                .font(.system(.body, design: .rounded))
+                            Text(app.developer ?? "AshteMobile")
+                                .font(.system(size: 15, weight: .medium, design: .rounded))
                                 .foregroundColor(.secondary)
-                                .lineSpacing(5)
+                            
+                            HomeDownloadButtonView(app: app, downloadManager: downloadManager, onDownloadComplete: onDownloadComplete)
+                                .frame(width: 100)
+                                .padding(.top, 8)
                         }
                     }
-                    .padding(16)
-                    .background(Color(UIColor.secondarySystemBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                }
-                .padding(.horizontal, 20)
-                .padding(.bottom, 30)
-                
-                // Information Section
-                VStack(alignment: .leading, spacing: 15) {
-                    Text("Information")
-                        .font(.system(.title3, design: .rounded).bold())
+                    .padding(.horizontal, 24)
+                    .offset(y: -60)
+                    .padding(.bottom, -30)
                     
-                    VStack(spacing: 0) {
-                        AppInfoRow(title: "Source", value: "AshteMobile Repo", isLast: false)
-                        AppInfoRow(title: "Developer", value: app.developer ?? "Unknown", isLast: false)
-                        AppInfoRow(title: "Size", value: app.size ?? "Unknown", isLast: false)
-                        AppInfoRow(title: "Version", value: app.version ?? "1.0", isLast: false)
-                        AppInfoRow(title: "Identifier", value: app.bundle ?? "com.ashte.\(app.name.replacingOccurrences(of: " ", with: "").lowercased())", isLast: true)
+                    // Glassmorphic Stats
+                    HStack(spacing: 16) {
+                        StatCard(icon: "bolt.fill", title: "Version", value: app.version ?? "1.0")
+                        StatCard(icon: "externaldrive.fill", title: "Size", value: app.size ?? "Unknown")
+                        StatCard(icon: "chart.bar.fill", title: "Category", value: app.category ?? "App")
                     }
-                    .background(Color(UIColor.secondarySystemBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 35)
+                    
+                    // Description
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("About this app")
+                            .font(.system(size: 22, weight: .bold, design: .rounded))
+                        
+                        VStack(alignment: .leading, spacing: 12) {
+                            if let hacks = app.hack, !hacks.isEmpty {
+                                ForEach(hacks, id: \.self) { hack in
+                                    HStack(alignment: .top, spacing: 12) {
+                                        Image(systemName: "checkmark.circle.fill")
+                                            .foregroundColor(.blue)
+                                            .font(.system(size: 16))
+                                            .padding(.top, 2)
+                                        Text(hack)
+                                            .font(.system(size: 15, weight: .regular, design: .rounded))
+                                            .foregroundColor(.primary.opacity(0.8))
+                                            .lineSpacing(4)
+                                    }
+                                }
+                            } else {
+                                Text("Download \(app.name) now and enjoy smooth performance and regular updates directly from the AshteMobile Store.")
+                                    .font(.system(size: 15, weight: .regular, design: .rounded))
+                                    .foregroundColor(.primary.opacity(0.8))
+                                    .lineSpacing(6)
+                            }
+                        }
+                        .padding(20)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(.ultraThinMaterial)
+                        .overlay(RoundedRectangle(cornerRadius: 24, style: .continuous).stroke(Color.white.opacity(0.1), lineWidth: 1))
+                        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 35)
+                    
+                    // Information
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("Information")
+                            .font(.system(size: 22, weight: .bold, design: .rounded))
+                        
+                        VStack(spacing: 0) {
+                            AppInfoRow(title: "Source", value: "AshteMobile Repo", isLast: false)
+                            AppInfoRow(title: "Developer", value: app.developer ?? "Unknown", isLast: false)
+                            AppInfoRow(title: "Size", value: app.size ?? "Unknown", isLast: false)
+                            AppInfoRow(title: "Version", value: app.version ?? "1.0", isLast: false)
+                            AppInfoRow(title: "Identifier", value: app.bundle ?? "com.ashte.\(app.name.replacingOccurrences(of: " ", with: "").lowercased())", isLast: true)
+                        }
+                        .background(.ultraThinMaterial)
+                        .overlay(RoundedRectangle(cornerRadius: 24, style: .continuous).stroke(Color.white.opacity(0.1), lineWidth: 1))
+                        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 60)
                 }
-                .padding(.horizontal, 20)
-                .padding(.bottom, 50)
             }
+            .navigationBarHidden(true)
+            .ignoresSafeArea(edges: .top)
         }
-        .navigationBarHidden(true)
-        .ignoresSafeArea(edges: .top)
     }
     
     private func safeAreaTop() -> CGFloat {
@@ -379,24 +409,25 @@ struct StatCard: View {
     let icon: String
     let title: String
     let value: String
-    let color: Color
     
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 10) {
             Image(systemName: icon)
-                .font(.system(size: 20))
-                .foregroundColor(color)
+                .font(.system(size: 20, weight: .semibold))
+                .foregroundColor(.primary)
             Text(title)
                 .font(.system(size: 12, weight: .medium, design: .rounded))
                 .foregroundColor(.secondary)
             Text(value)
-                .font(.system(size: 15, weight: .bold, design: .rounded))
+                .font(.system(size: 14, weight: .bold, design: .rounded))
                 .foregroundColor(.primary)
+                .lineLimit(1)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 16)
-        .background(Color(UIColor.secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .background(.ultraThinMaterial)
+        .overlay(RoundedRectangle(cornerRadius: 20, style: .continuous).stroke(Color.white.opacity(0.1), lineWidth: 1))
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
     }
 }
 
@@ -409,20 +440,21 @@ struct AppInfoRow: View {
         VStack(spacing: 0) {
             HStack {
                 Text(title)
-                    .font(.system(.body, design: .rounded))
+                    .font(.system(size: 15, weight: .medium, design: .rounded))
                     .foregroundColor(.secondary)
                 Spacer()
                 Text(value)
-                    .font(.system(.body, design: .rounded).weight(.medium))
+                    .font(.system(size: 15, weight: .semibold, design: .rounded))
                     .foregroundColor(.primary)
                     .lineLimit(1)
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 14)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 16)
             
             if !isLast {
                 Divider()
-                    .padding(.leading, 16)
+                    .background(Color.white.opacity(0.1))
+                    .padding(.leading, 20)
             }
         }
     }
@@ -441,45 +473,46 @@ struct FeaturedAppView: View {
             } placeholder: {
                 Color.gray.opacity(0.2)
             }
-            .frame(height: 240)
+            .frame(height: 280)
             
-            // Gradient Overlay for readability
-            LinearGradient(colors: [.clear, .black.opacity(0.5), .black.opacity(0.85)], startPoint: .top, endPoint: .bottom)
+            // Rich Gradient Overlay
+            LinearGradient(colors: [.clear, .black.opacity(0.4), .black.opacity(0.9)], startPoint: .top, endPoint: .bottom)
             
             HStack(alignment: .bottom) {
                 VStack(alignment: .leading, spacing: 8) {
                     if let status = app.status {
                         Text(status.uppercased())
-                            .font(.system(size: 11, weight: .black, design: .rounded))
+                            .font(.system(size: 10, weight: .black, design: .rounded))
+                            .tracking(1.5)
                             .foregroundColor(.white)
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 5)
-                            .background(.ultraThinMaterial)
-                            .environment(\.colorScheme, .dark)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(Color.blue)
                             .clipShape(Capsule())
                     }
                     
                     Text(app.name)
-                        .font(.system(.title, design: .rounded).bold())
+                        .font(.system(size: 28, weight: .bold, design: .rounded))
                         .foregroundColor(.white)
                         .lineLimit(1)
                     
-                    Text(app.category ?? "Featured App")
-                        .font(.system(.subheadline, design: .rounded))
-                        .foregroundColor(.white.opacity(0.8))
+                    Text(app.category ?? "Featured Collection")
+                        .font(.system(size: 15, weight: .medium, design: .rounded))
+                        .foregroundColor(.white.opacity(0.7))
                 }
                 Spacer()
                 
                 HomeDownloadButtonView(app: app, downloadManager: downloadManager, onDownloadComplete: onDownloadComplete)
-                    .frame(width: 80)
+                    .frame(width: 85)
                     .environment(\.colorScheme, .dark)
             }
-            .padding(20)
+            .padding(24)
         }
-        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-        .padding(.horizontal, 20)
+        .clipShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 32, style: .continuous).stroke(Color.white.opacity(0.15), lineWidth: 1))
+        .padding(.horizontal, 24)
         .padding(.bottom, 20)
-        .shadow(color: Color.black.opacity(0.12), radius: 10, x: 0, y: 5)
+        .shadow(color: Color.black.opacity(0.2), radius: 15, x: 0, y: 8)
     }
 }
 
@@ -490,20 +523,20 @@ struct HomeAppCardView: View {
     var onDownloadComplete: () -> Void 
     
     var body: some View {
-        VStack(alignment: .center, spacing: 10) {
+        VStack(alignment: .center, spacing: 12) {
             
             AsyncImage(url: app.fullImageURL) { image in
                 image.resizable().aspectRatio(contentMode: .fill)
             } placeholder: {
                 Color.gray.opacity(0.1)
             }
-            .frame(width: 80, height: 80)
-            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-            .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
+            .frame(width: 85, height: 85)
+            .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+            .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
             
-            VStack(spacing: 3) {
+            VStack(spacing: 4) {
                 Text(app.name)
-                    .font(.system(size: 15, weight: .bold, design: .rounded))
+                    .font(.system(size: 16, weight: .bold, design: .rounded))
                     .foregroundColor(.primary)
                     .lineLimit(1)
                     .multilineTextAlignment(.center)
@@ -517,33 +550,35 @@ struct HomeAppCardView: View {
             
             HomeDownloadButtonView(app: app, downloadManager: downloadManager, onDownloadComplete: onDownloadComplete)
         }
-        .padding(15)
-        .frame(width: 140, height: 210)
-        .background(Color(UIColor.secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .padding(16)
+        .frame(width: 145, height: 220)
+        .background(.ultraThinMaterial)
+        .overlay(RoundedRectangle(cornerRadius: 28, style: .continuous).stroke(Color.white.opacity(0.1), lineWidth: 1))
+        .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
     }
 }
 
 // MARK: - Social Media Footer
 struct SocialMediaFooter: View {
     var body: some View {
-        VStack(spacing: 20) {
-            Text("Follow Us")
-                .font(.system(.headline, design: .rounded).weight(.bold))
+        VStack(spacing: 24) {
+            Text("Connect With Us")
+                .font(.system(size: 20, weight: .bold, design: .rounded))
                 .foregroundColor(.primary)
             
-            HStack(spacing: 25) {
+            HStack(spacing: 28) {
                 SocialButton(icon: "paperplane.fill", color: .blue, url: "https://t.me/ashtemobile")
-                SocialButton(icon: "camera.fill", color: Color(UIColor.systemPurple), url: "https://www.instagram.com/ashtemobile")
-                SocialButton(icon: "play.tv.fill", color: .black, url: "https://www.tiktok.com/@ashtemobile")
-                SocialButton(icon: "snapchat", color: .yellow, url: "https://www.snapchat.com/add/ashtemmobile") // دەتوانیت ئایکۆنی سناپ بگۆڕیت ئەگەر کێشەی هەبوو
+                SocialButton(icon: "camera.fill", color: .purple, url: "https://www.instagram.com/ashtemobile")
+                SocialButton(icon: "play.tv.fill", color: .primary, url: "https://www.tiktok.com/@ashtemobile")
             }
         }
-        .padding(.vertical, 25)
+        .padding(.vertical, 30)
         .frame(maxWidth: .infinity)
-        .background(Color(UIColor.secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
-        .padding(.horizontal, 20)
+        .background(.ultraThinMaterial)
+        .overlay(RoundedRectangle(cornerRadius: 32, style: .continuous).stroke(Color.white.opacity(0.1), lineWidth: 1))
+        .clipShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
+        .padding(.horizontal, 24)
     }
 }
 
@@ -559,24 +594,24 @@ struct SocialButton: View {
             }
         }) {
             Image(systemName: icon)
-                .font(.system(size: 22))
+                .font(.system(size: 22, weight: .bold))
                 .foregroundColor(.white)
-                .frame(width: 50, height: 50)
-                .background(color)
+                .frame(width: 56, height: 56)
+                .background(
+                    LinearGradient(colors: [color.opacity(0.8), color], startPoint: .topLeading, endPoint: .bottomTrailing)
+                )
                 .clipShape(Circle())
-                .shadow(color: color.opacity(0.4), radius: 8, x: 0, y: 4)
+                .shadow(color: color.opacity(0.4), radius: 10, x: 0, y: 5)
         }
-        // کەمێک جوڵەی پێ بدە کاتێک پەنجەی پێدا دەنێیت
         .buttonStyle(ScaleButtonStyle())
     }
 }
 
-// جوڵەیەکی مۆدێرن بۆ دوگمەکان
 struct ScaleButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .scaleEffect(configuration.isPressed ? 0.92 : 1)
-            .animation(.easeInOut(duration: 0.2), value: configuration.isPressed)
+            .scaleEffect(configuration.isPressed ? 0.9 : 1)
+            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: configuration.isPressed)
     }
 }
 
@@ -662,43 +697,43 @@ struct HomeDownloadButtonView: View {
         ZStack {
             if downloader.isFinished {
                 Image(systemName: "checkmark")
-                    .font(.system(size: 14, weight: .bold))
+                    .font(.system(size: 15, weight: .bold))
                     .frame(maxWidth: .infinity)
-                    .frame(height: 32)
-                    .background(Color.green.opacity(0.15))
+                    .frame(height: 34)
+                    .background(Color.green.opacity(0.2))
                     .foregroundColor(.green)
                     .clipShape(Capsule())
                     .transition(.scale.combined(with: .opacity))
             } else if downloader.isDownloading {
                 ZStack {
                     Circle()
-                        .stroke(Color.gray.opacity(0.3), lineWidth: 3)
-                        .frame(width: 28, height: 28)
+                        .stroke(Color.gray.opacity(0.2), lineWidth: 3.5)
+                        .frame(width: 30, height: 30)
                     
                     if downloader.progress > 0 {
                         Circle()
                             .trim(from: 0, to: downloader.progress)
-                            .stroke(Color.blue, style: StrokeStyle(lineWidth: 3, lineCap: .round))
+                            .stroke(Color.blue, style: StrokeStyle(lineWidth: 3.5, lineCap: .round))
                             .rotationEffect(.degrees(-90))
-                            .frame(width: 28, height: 28)
+                            .frame(width: 30, height: 30)
                             .animation(.linear(duration: 0.2), value: downloader.progress)
                     } else {
                         ProgressView()
                             .progressViewStyle(CircularProgressViewStyle(tint: .blue))
                     }
                     
-                    RoundedRectangle(cornerRadius: 3)
+                    RoundedRectangle(cornerRadius: 4)
                         .fill(Color.blue)
                         .frame(width: 10, height: 10)
                         .onTapGesture {
                             withAnimation { downloader.stop() }
                         }
                 }
-                .frame(height: 32)
+                .frame(height: 34)
             } else {
                 Button(action: {
                     if let downloadURL = URL(string: app.url) {
-                        let generator = UIImpactFeedbackGenerator(style: .medium)
+                        let generator = UIImpactFeedbackGenerator(style: .rigid)
                         generator.impactOccurred()
                         
                         withAnimation {
@@ -714,15 +749,15 @@ struct HomeDownloadButtonView: View {
                     Text("GET")
                         .font(.system(size: 14, weight: .bold, design: .rounded))
                         .frame(maxWidth: .infinity)
-                        .frame(height: 32)
-                        .background(Color.blue.opacity(0.12))
+                        .frame(height: 34)
+                        .background(Color.blue.opacity(0.15))
                         .foregroundColor(.blue)
                         .clipShape(Capsule())
                 }
                 .buttonStyle(ScaleButtonStyle()) 
             }
         }
-        .animation(.spring(), value: downloader.isDownloading)
-        .animation(.spring(), value: downloader.isFinished)
+        .animation(.spring(response: 0.4, dampingFraction: 0.7), value: downloader.isDownloading)
+        .animation(.spring(response: 0.4, dampingFraction: 0.7), value: downloader.isFinished)
     }
 }
