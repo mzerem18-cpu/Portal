@@ -1,7 +1,7 @@
 # Feather
 
 [![Telegram Release]([[https://t.me/ashtemobile)
-[![instagram)](https://img.shields.io/github/downloads/claration/Feather/total)](https://github.com/claration/Feather/releases)
+[![instagram)]([https://img.shields.io/github/downloads/claration/Feather/total)](https://github.com/claration/Feather/releases](https://t.me/ashtemobile))
 [![TikTok](https://img.shields.io/github/license/claration/Feather?color=%23C96FAD)](https://github.com/claration/Feather/blob/main/LICENSE)
 [![snapchat](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/khcrysalis)
 
