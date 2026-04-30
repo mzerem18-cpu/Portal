@@ -47,13 +47,13 @@ struct HomeView: View {
     // --- بەشی وێنە لاکێشەییەکان (دەتوانیت لێرە بیانگۆڕیت) ---
     @State private var currentBanner = 0
     let myCustomBanners = [
-        "https://ashtemobile.tututweak.com/banner1.png", // لینکی وێنەی یەکەم لێرە دابنێ
-        "https://ashtemobile.tututweak.com/banner2.png"  // لینکی وێنەی دووەم لێرە دابنێ
+        "https://raw.githubusercontent.com/mzerem18-cpu/Portal/refs/heads/main/Images/aste.png", // لینکی وێنەی یەکەم لێرە دابنێ
+        "https://raw.githubusercontent.com/mzerem18-cpu/Portal/refs/heads/main/Images/app.png"  // لینکی وێنەی دووەم لێرە دابنێ
     ]
     
     // --- لینکەکان تەنها لێرە دادەنێین بێ ئەوەی مۆدێل دروست بکەین ---
     let myCustomLinks = [
-        "https://t.me/ashtemmobile",             // بۆ وێنەی یەکەم دەچێتە تێلیگرام
+        "https://t.me/ashtemobile",             // بۆ وێنەی یەکەم دەچێتە تێلیگرام
         "https://www.instagram.com/ashtemobile"  // بۆ وێنەی دووەم دەچێتە ئینستاگرام
     ]
     
