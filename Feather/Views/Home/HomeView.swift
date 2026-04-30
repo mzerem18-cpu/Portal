@@ -36,12 +36,6 @@ struct HomeApp: Codable, Identifiable {
     }
 }
 
-// مۆدێلێکی نوێ تەنها بۆ وێنە لاکێشەییەکان و لینکەکانیان
-struct CustomBannerItem: Hashable {
-    let image: String
-    let link: String
-}
-
 // MARK: - Main Home View
 struct HomeView: View {
     @StateObject var downloadManager = DownloadManager.shared
@@ -53,11 +47,16 @@ struct HomeView: View {
     // --- بەشی وێنە لاکێشەییەکان (دەتوانیت لێرە بیانگۆڕیت) ---
     @State private var currentBanner = 0
     let myCustomBanners = [
-        // وێنەی یەکەم و لینکەکەی (بۆ نموونە تێلیگرام)
-        CustomBannerItem(image: "https://ashtemobile.tututweak.com/banner1.png", link: "https://t.me/ashtemmobile"),
-        // وێنەی دووەم و لینکەکەی (بۆ نموونە ئینستاگرام)
-        CustomBannerItem(image: "https://ashtemobile.tututweak.com/banner2.png", link: "https://www.instagram.com/ashtemobile")
+        "https://ashtemobile.tututweak.com/banner1.png", // لینکی وێنەی یەکەم لێرە دابنێ
+        "https://ashtemobile.tututweak.com/banner2.png"  // لینکی وێنەی دووەم لێرە دابنێ
     ]
+    
+    // --- لینکەکان تەنها لێرە دادەنێین بێ ئەوەی مۆدێل دروست بکەین ---
+    let myCustomLinks = [
+        "https://t.me/ashtemmobile",             // بۆ وێنەی یەکەم دەچێتە تێلیگرام
+        "https://www.instagram.com/ashtemobile"  // بۆ وێنەی دووەم دەچێتە ئینستاگرام
+    ]
+    
     // کاتی ئۆتۆماتیکی گۆڕینی وێنەکان (هەر 4 چرکە جارێک)
     let timer = Timer.publish(every: 4, on: .main, in: .common).autoconnect()
     // -------------------------------------------------------
@@ -65,10 +64,6 @@ struct HomeView: View {
     var groupedApps: [(String, [HomeApp])] {
         let dict = Dictionary(grouping: apps, by: { $0.category ?? "Apps" })
         return dict.sorted { $0.key < $1.key }
-    }
-    
-    var bannerHeight: CGFloat {
-        UIScreen.main.bounds.width * (1948.0 / 3464.0)
     }
     
     var body: some View {
@@ -83,31 +78,31 @@ struct HomeView: View {
                         if !myCustomBanners.isEmpty {
                             TabView(selection: $currentBanner) {
                                 ForEach(0..<myCustomBanners.count, id: \.self) { index in
-                                    // لێرەدا دوگمەمان بۆ زیاد کردووە بۆ ئەوەی کلیک بکرێت
+                                    // دانانی دوگمەکە بۆ کردنەوەی لینکەکان
                                     Button(action: {
-                                        if let url = URL(string: myCustomBanners[index].link) {
+                                        if index < myCustomLinks.count, let url = URL(string: myCustomLinks[index]) {
                                             UIApplication.shared.open(url)
                                         }
                                     }) {
-                                        AsyncImage(url: URL(string: myCustomBanners[index].image)) { image in
+                                        AsyncImage(url: URL(string: myCustomBanners[index])) { image in
                                             image.resizable()
                                                  .aspectRatio(contentMode: .fill)
                                         } placeholder: {
-                                            ZStack {
-                                                Color(UIColor.secondarySystemBackground)
-                                                ProgressView()
-                                            }
+                                            Color(UIColor.secondarySystemBackground)
+                                                .overlay(Image(systemName: "photo").foregroundColor(.gray.opacity(0.5)))
                                         }
                                     }
-                                    .buttonStyle(.plain) // بۆ ئەوەی ڕەنگەکەی نەبێت بە شین
+                                    .buttonStyle(.plain)
                                     .tag(index)
                                 }
                             }
-                            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .always))
-                            .frame(height: bannerHeight)
-                            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                            // دانانی قەبارەی وێنەکان ڕێک بۆ (3464x1948)
+                            .frame(height: (UIScreen.main.bounds.width - 40) * (1948.0 / 3464.0))
+                            .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
                             .padding(.horizontal, 20)
-                            .shadow(color: Color.black.opacity(0.1), radius: 8, x: 0, y: 4)
+                            .shadow(color: Color.black.opacity(0.12), radius: 10, x: 0, y: 5)
+                            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .always))
+                            // جوڵاندنی ئۆتۆماتیکی
                             .onReceive(timer) { _ in
                                 guard !myCustomBanners.isEmpty else { return }
                                 withAnimation(.easeInOut(duration: 0.5)) {
@@ -253,7 +248,7 @@ struct HomeAppDetailView: View {
     @ObservedObject var downloadManager: DownloadManager
     var onDownloadComplete: () -> Void
     
-    @Environment(\.dismiss) var dismiss
+    @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
         ZStack {
@@ -262,6 +257,7 @@ struct HomeAppDetailView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
                     
+                    // Header Image
                     GeometryReader { proxy in
                         let minY = proxy.frame(in: .global).minY
                         let isScrolledDown = minY > 0
@@ -281,8 +277,9 @@ struct HomeAppDetailView: View {
                             )
                             .offset(y: offset)
                             
+                            // Navigation Buttons
                             HStack {
-                                Button(action: { dismiss() }) {
+                                Button(action: { presentationMode.wrappedValue.dismiss() }) {
                                     Image(systemName: "chevron.left")
                                         .font(.system(size: 16, weight: .bold))
                                         .foregroundColor(.primary)
@@ -311,6 +308,7 @@ struct HomeAppDetailView: View {
                     }
                     .frame(height: 280)
                     
+                    // App Info
                     HStack(alignment: .center, spacing: 16) {
                         AsyncImage(url: app.fullImageURL) { image in
                             image.resizable().aspectRatio(contentMode: .fill)
@@ -339,6 +337,7 @@ struct HomeAppDetailView: View {
                     .offset(y: -40)
                     .padding(.bottom, -20)
                     
+                    // Stats
                     HStack(spacing: 12) {
                         StatCard(icon: "tag.fill", title: "Version", value: app.version ?? "1.0", color: .blue)
                         StatCard(icon: "shippingbox.fill", title: "Size", value: app.size ?? "Unknown", color: .purple)
@@ -347,6 +346,7 @@ struct HomeAppDetailView: View {
                     .padding(.horizontal, 20)
                     .padding(.bottom, 30)
                     
+                    // Description
                     VStack(alignment: .leading, spacing: 14) {
                         Text("Description")
                             .font(.system(size: 20, weight: .bold, design: .rounded))
@@ -381,6 +381,7 @@ struct HomeAppDetailView: View {
                     .padding(.horizontal, 20)
                     .padding(.bottom, 30)
                     
+                    // Information List
                     VStack(alignment: .leading, spacing: 14) {
                         Text("Information")
                             .font(.system(size: 20, weight: .bold, design: .rounded))
