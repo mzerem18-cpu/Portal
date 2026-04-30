@@ -30,4 +30,3 @@ Visit [releases](https://github.com/claration/Feather/releases) and get the late
 <a href="https://github.com/claration/Feather/releases/latest/download/Feather.ipa" target="_blank">
    <img src="https://github.com/CelloSerenity/altdirect/blob/main/assets/png/Download_Blue.png?raw=true" alt="Download .ipa" width="200">
 </a>
-#
