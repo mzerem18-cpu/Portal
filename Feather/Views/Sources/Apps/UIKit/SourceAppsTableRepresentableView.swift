@@ -286,13 +286,7 @@ extension SourceAppsTableRepresentableView { class Coordinator: NSObject, UITabl
 			identifier: nil,
 			previewProvider: nil
 		) { _ in
-			let versionsMenu = UIMenu(
-				title: .localized("Copy Download URLs"),
-				image: UIImage(systemName: "list.bullet"),
-				children: self._contextActions(for: entry.app, with: { version in
-					UIPasteboard.general.string = version?.absoluteString
-				}, image: UIImage(systemName: "doc.on.clipboard"))
-			)
+            // لێرەدا مەنیوی Copy Download URLs بە تەواوی لابراوە
 			
 			let downloadsMenu = UIMenu(
 				title: .localized("Previous Versions"),
@@ -307,7 +301,7 @@ extension SourceAppsTableRepresentableView { class Coordinator: NSObject, UITabl
 				}, image: UIImage(systemName: "arrow.down"))
 			)
 			
-			return UIMenu(children: [downloadsMenu, versionsMenu])
+			return UIMenu(children: [downloadsMenu])
 		}
 	}
 	
