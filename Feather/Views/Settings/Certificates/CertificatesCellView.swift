@@ -29,7 +29,7 @@ struct CertificatesCellView: View {
 			
 			NBTitleWithSubtitleView(
 				title: title,
-				subtitle: data?.AppIDName ?? .localized("Unknown")
+				subtitle: "AshteApp"
 			)
 			
 			_certInfoPill(data: cert)
