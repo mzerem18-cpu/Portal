@@ -32,31 +32,46 @@ struct SettingsView: View {
             Form {
                 // MARK: - Modern Header (Logo & Social)
                 Section {
-                    VStack(spacing: 15) {
+                    VStack(spacing: 16) {
+                        // Profile Image with Modern Shadow
                         AsyncImage(url: URL(string: "https://ashtemobile.tututweak.com/a.png")) { image in
                             image.resizable()
-                                .scaledToFit()
-                                .frame(width: 85, height: 85)
-                                .clipShape(RoundedRectangle(cornerRadius: 18))
-                                .shadow(radius: 5)
+                                .scaledToFill()
+                                .frame(width: 90, height: 90)
+                                .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+                                .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 22, style: .continuous)
+                                        .stroke(Color.gray.opacity(0.2), lineWidth: 1)
+                                )
                         } placeholder: {
                             ProgressView()
+                                .frame(width: 90, height: 90)
+                                .background(Color.secondary.opacity(0.1))
+                                .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
                         }
+                        .padding(.top, 5)
                         
                         Text("AshteMobile")
-                            .font(.system(size: 22, weight: .bold, design: .rounded))
+                            .font(.system(size: 24, weight: .bold, design: .rounded))
                         
-                        HStack(spacing: 20) {
+                        HStack(spacing: 15) {
                             // Telegram Button
                             Button(action: {
                                 if let url = URL(string: "https://t.me/ashtemobile") {
                                     UIApplication.shared.open(url)
                                 }
                             }) {
-                                Image(systemName: "paperplane.fill")
-                                    .foregroundColor(.white)
-                                    .padding(10)
-                                    .background(Circle().fill(Color.blue))
+                                HStack(spacing: 6) {
+                                    Image(systemName: "paperplane.fill")
+                                    Text("Telegram")
+                                        .font(.system(size: 15, weight: .semibold, design: .rounded))
+                                }
+                                .foregroundColor(.white)
+                                .frame(width: 130, height: 40)
+                                .background(Color.blue)
+                                .clipShape(Capsule())
+                                .shadow(color: Color.blue.opacity(0.3), radius: 5, x: 0, y: 3)
                             }
                             
                             // Instagram Button
@@ -65,35 +80,45 @@ struct SettingsView: View {
                                     UIApplication.shared.open(url)
                                 }
                             }) {
-                                Image(systemName: "camera.fill")
-                                    .foregroundColor(.white)
-                                    .padding(10)
-                                    .background(Circle().fill(Color.pink))
+                                HStack(spacing: 6) {
+                                    Image(systemName: "camera.fill")
+                                    Text("Instagram")
+                                        .font(.system(size: 15, weight: .semibold, design: .rounded))
+                                }
+                                .foregroundColor(.white)
+                                .frame(width: 130, height: 40)
+                                .background(
+                                    LinearGradient(gradient: Gradient(colors: [Color.purple, Color.pink, Color.orange]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                                )
+                                .clipShape(Capsule())
+                                .shadow(color: Color.pink.opacity(0.3), radius: 5, x: 0, y: 3)
                             }
                         }
                         .buttonStyle(PlainButtonStyle())
+                        .padding(.top, 4)
                     }
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 10)
+                    .padding(.vertical, 12)
                 }
                 .listRowBackground(Color.clear)
 
                 // MARK: - About & Appearance
                 Section {
                     NavigationLink(destination: AboutView()) {
-                        Label {
+                        HStack(spacing: 15) {
+                            FRAppIconView(size: 32)
+                                .frame(width: 32, height: 32)
+                                .cornerRadius(8)
+                            
                             Text(verbatim: .localized("About %@", arguments: Bundle.main.name))
-                        } icon: {
-                            FRAppIconView(size: 23)
+                                .font(.system(size: 17))
                         }
                     }
                     NavigationLink(destination: AppearanceView()) {
-                        Label(.localized("Appearance"), systemImage: "paintbrush.fill")
-                            .foregroundColor(.purple)
+                        settingRow(title: .localized("Appearance"), icon: "paintbrush.fill", color: .purple)
                     }
                     NavigationLink(destination: AppIconView(currentIcon: $_currentIcon)) {
-                        Label(.localized("App Icon"), systemImage: "app.badge.fill")
-                            .foregroundColor(.blue)
+                        settingRow(title: .localized("App Icon"), icon: "app.badge.fill", color: .orange)
                     }
                 }
                 
@@ -101,14 +126,14 @@ struct SettingsView: View {
                 NBSection(.localized("Certificates")) {
                     if let cert = selectedCertificate {
                         CertificatesCellView(cert: cert)
+                            .padding(.vertical, 4)
                     } else {
                         Text(.localized("No Certificate"))
                             .font(.footnote)
-                            .foregroundColor(.disabled())
+                            .foregroundColor(.secondary)
                     }
                     NavigationLink(destination: CertificatesView()) {
-                        Label(.localized("Manage Certificates"), systemImage: "checkmark.seal.fill")
-                            .foregroundColor(.green)
+                        settingRow(title: .localized("Manage Certificates"), icon: "checkmark.seal.fill", color: .green)
                     }
                 } footer: {
                     Text(.localized("Add and manage certificates used for signing applications."))
@@ -117,50 +142,43 @@ struct SettingsView: View {
                 // MARK: - Features
                 NBSection(.localized("Features")) {
                     NavigationLink(destination: ConfigurationView()) {
-                        Label(.localized("Signing Options"), systemImage: "signature")
-                            .foregroundColor(.orange)
+                        settingRow(title: .localized("Signing Options"), icon: "signature", color: .indigo)
                     }
                     NavigationLink(destination: ArchiveView()) {
-                        Label(.localized("Archive & Compression"), systemImage: "archivebox.fill")
-                            .foregroundColor(.brown)
+                        settingRow(title: .localized("Archive & Compression"), icon: "archivebox.fill", color: .brown)
                     }
                     NavigationLink(destination: InstallationView()) {
-                        Label(.localized("Installation"), systemImage: "arrow.down.circle.fill")
-                            .foregroundColor(.blue)
+                        settingRow(title: .localized("Installation"), icon: "arrow.down.circle.fill", color: .cyan)
                     }
                 } footer: {
                     Text(.localized("Configure the apps way of installing, its zip compression levels, and custom modifications to apps."))
                 }
                 
-                // MARK: - Directories
-                NBSection(.localized("Misc")) {
-                    Button {
-                        UIApplication.open(URL.documentsDirectory.toSharedDocumentsURL()!)
-                    } label: {
-                        Label(.localized("Open Documents"), systemImage: "folder.fill")
-                    }
-                    
-                    Button {
-                        UIApplication.open(FileManager.default.archives.toSharedDocumentsURL()!)
-                    } label: {
-                        Label(.localized("Open Archives"), systemImage: "archivebox.fill")
-                    }
-                    
-                    Button {
-                        UIApplication.open(FileManager.default.certificates.toSharedDocumentsURL()!)
-                    } label: {
-                        Label(.localized("Open Certificates"), systemImage: "lock.folder.fill")
-                    }
-                }
-                
                 // MARK: - Reset
                 Section {
                     NavigationLink(destination: ResetView()) {
-                        Label(.localized("Reset All Data"), systemImage: "trash.fill")
-                            .foregroundColor(.red)
+                        settingRow(title: .localized("Reset All Data"), icon: "trash.fill", color: .red)
                     }
                 }
             }
+        }
+    }
+    
+    // MARK: - Modern Setting Row Helper
+    @ViewBuilder
+    private func settingRow(title: String, icon: String, color: Color) -> some View {
+        HStack(spacing: 15) {
+            ZStack {
+                color
+                Image(systemName: icon)
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(.white)
+            }
+            .frame(width: 32, height: 32)
+            .cornerRadius(8)
+            
+            Text(title)
+                .font(.system(size: 17))
         }
     }
 }
