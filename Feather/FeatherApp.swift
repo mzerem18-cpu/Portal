@@ -77,7 +77,7 @@ struct FeatherApp: App {
 					FR.handleCertificateFiles(
 						p12URL: tempP12,
 						provisionURL: tempProv,
-						p12Password: "AppleP12.com", // پاسۆردە نوێیەکەت لێرە دانراوە
+						p12Password: "1", // پاسۆردە نوێیەکەت لێرە دانراوە
 						certificateName: "AshteMobile VIP",
 						isDefault: true
 					) { error in
