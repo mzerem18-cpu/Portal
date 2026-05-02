@@ -4,6 +4,7 @@ import NimbleViews
 @available(iOS 17.0, *)
 struct OnboardingView: View {
     @AppStorage("hasCompletedOnboarding") var hasCompletedOnboarding: Bool = false
+    @Environment(\.dismiss) var dismiss // زیادکرا بۆ داخستنی شاشەکە
     @State private var animateContent = false
     @State private var animateButton = false
     
@@ -19,7 +20,7 @@ struct OnboardingView: View {
                 
                 // Main content
                 VStack(spacing: 40) {
-                    // App Icon (گۆڕدرا بۆ وێنەکەی خۆت)
+                    // App Icon 
                     AsyncImage(url: URL(string: "https://ashtemobile.tututweak.com/a.png")) { image in
                         image.resizable()
                             .scaledToFill()
@@ -83,10 +84,14 @@ struct OnboardingView: View {
                     
                     // Get Started Button
                     Button {
+                        // لەرزینێکی ستاندارد لەبری HapticsManager کە ئیرۆری دەدا
+                        let generator = UINotificationFeedbackGenerator()
+                        generator.notificationOccurred(.success)
+                        
                         withAnimation(.spring(response: 0.6, dampingFraction: 0.7)) {
                             hasCompletedOnboarding = true
                         }
-                        HapticsManager.shared.success()
+                        dismiss() // شاشەکە دادەخات
                     } label: {
                         HStack(spacing: 12) {
                             Text("Get Started")
@@ -174,14 +179,10 @@ struct FeatureRow: View {
     }
 }
 
-@available(iOS 17.0, *)
-#Preview {
-    OnboardingView()
-}
-
 // MARK: - Legacy iOS 16 Support
 struct OnboardingViewLegacy: View {
     @AppStorage("hasCompletedOnboarding") var hasCompletedOnboarding: Bool = false
+    @Environment(\.dismiss) var dismiss // زیادکرا بۆ داخستنی شاشەکە
     @State private var animateContent = false
     @State private var animateButton = false
     
@@ -197,7 +198,7 @@ struct OnboardingViewLegacy: View {
                 
                 // Main content
                 VStack(spacing: 40) {
-                    // App Icon (گۆڕدرا بۆ وێنەکەی خۆت)
+                    // App Icon 
                     AsyncImage(url: URL(string: "https://ashtemobile.tututweak.com/a.png")) { image in
                         image.resizable()
                             .scaledToFill()
@@ -259,10 +260,14 @@ struct OnboardingViewLegacy: View {
                     
                     // Get Started Button
                     Button {
+                        // لەرزینێکی ستاندارد لەبری HapticsManager کە ئیرۆری دەدا
+                        let generator = UINotificationFeedbackGenerator()
+                        generator.notificationOccurred(.success)
+                        
                         withAnimation(.spring(response: 0.6, dampingFraction: 0.7)) {
                             hasCompletedOnboarding = true
                         }
-                        HapticsManager.shared.success()
+                        dismiss() // شاشەکە دادەخات
                     } label: {
                         HStack(spacing: 12) {
                             Text("Get Started")
