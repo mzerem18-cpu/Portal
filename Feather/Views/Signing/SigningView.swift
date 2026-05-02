@@ -1,9 +1,9 @@
 //
 //  SigningView.swift
-//  Feather
+//  Ashtemobile
 //
 //  Created by samara on 14.04.2025.
-//  Modernized UI Integrated - Fixed alignment and chevrons
+//  Modernized UI Integrated - Fixed all chevrons to match perfectly
 //
 
 import SwiftUI
@@ -254,8 +254,8 @@ extension SigningView {
                             
                             // سەهمەکەی لای ڕاست
                             Image(systemName: "chevron.right")
-                                .foregroundColor(.gray.opacity(0.5))
-                                .font(.system(size: 14, weight: .bold))
+                                .foregroundColor(.gray) // ڕەنگەکەی جێگیر کرا
+                                .font(.system(size: 14, weight: .semibold)) // قەبارەکەی جێگیر کرا
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 12)
@@ -301,7 +301,7 @@ extension SigningView {
                 } label: {
                     ActionRow(icon: "wrench.adjustable.fill", iconColor: .teal, title: .localized("Modify"), showChevron: false)
                 }
-                .tint(Color.gray.opacity(0.5)) // ڕەنگی سەهمەکەی Modify گۆڕدرا بۆ هاوسەنگی
+                .tint(.gray) // ڕەنگی سەهمەکەی Modify جێگیر کرا
                 .padding(.trailing, 16)
                 
                 Divider().padding(.leading, 16)
@@ -342,8 +342,8 @@ extension SigningView {
                     .foregroundColor(.primary)
                 Spacer()
                 Image(systemName: "chevron.right")
-                    .foregroundColor(.gray.opacity(0.5))
-                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(.gray) // ڕەنگ جێگیر کرا
+                    .font(.system(size: 14, weight: .semibold))
             }
             .padding(.vertical, 12)
             .padding(.horizontal, 16)
@@ -448,8 +448,8 @@ struct InfoRow: View {
                 .truncationMode(.tail)
             
             Image(systemName: "chevron.right")
-                .foregroundColor(.gray.opacity(0.5)) // ڕەنگی سەهم تۆختر کرا
-                .font(.system(size: 14, weight: .bold)) // قەبارەی سەهم گەورەتر کرا
+                .foregroundColor(.gray) // ڕەنگ جێگیر کرا
+                .font(.system(size: 14, weight: .semibold)) // قەبارە جێگیر کرا
         }
         .padding(.vertical, 12)
         .padding(.horizontal, 16)
@@ -484,8 +484,8 @@ struct ActionRow: View {
             
             if showChevron {
                 Image(systemName: "chevron.right")
-                    .foregroundColor(.gray.opacity(0.5)) // ڕەنگی سەهم تۆختر کرا
-                    .font(.system(size: 14, weight: .bold)) // قەبارەی سەهم گەورەتر کرا
+                    .foregroundColor(.gray) // ڕەنگ جێگیر کرا
+                    .font(.system(size: 14, weight: .semibold)) // قەبارە جێگیر کرا
             }
         }
         .padding(.vertical, 12)
