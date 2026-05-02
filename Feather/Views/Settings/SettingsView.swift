@@ -103,14 +103,14 @@ struct SettingsView: View {
                 .listRowBackground(Color.clear)
 
                 // MARK: - About & Appearance
-                Section {
+                NBSection(.localized("About")) {
                     NavigationLink(destination: AboutView()) {
                         HStack(spacing: 15) {
                             FRAppIconView(size: 32)
                                 .frame(width: 32, height: 32)
                                 .cornerRadius(8)
                             
-                            Text(verbatim: .localized("About %@", arguments: Bundle.main.name))
+                            Text("AshteMobile")
                                 .font(.system(size: 17))
                         }
                     }
