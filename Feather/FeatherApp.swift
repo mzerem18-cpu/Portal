@@ -3,7 +3,7 @@
 //  Feather
 //
 //  Created by samara on 10.04.2025.
-//  Modified for AshteMobile with Onboarding Support
+//  Safe Onboarding Integrated
 //
 
 import SwiftUI
@@ -20,8 +20,16 @@ struct FeatherApp: App {
     @StateObject var downloadManager = DownloadManager.shared
     let storage = Storage.shared
     
-    // 💡 ئەمە ئەو گۆڕاوەیە کە دەزانێت ئایا بەکارهێنەرەکە پێشتر شاشەکەی بینیوە یان نا
+    // گۆڕاوەکە بۆ زانینی ئەوەی کە شاشەکە بینراوە یان نا
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding: Bool = false
+    
+    // 💡 دروستکردنی بایندینگی سەلامەت بۆ ئەوەی Xcode ئیرۆر نەدات
+    private var showOnboardingBinding: Binding<Bool> {
+        Binding<Bool>(
+            get: { !hasCompletedOnboarding },
+            set: { newValue in hasCompletedOnboarding = !newValue }
+        )
+    }
     
     var body: some Scene {
         WindowGroup {
@@ -35,16 +43,14 @@ struct FeatherApp: App {
             }
             .animation(.smooth, value: downloadManager.manualDownloads.description)
             
-            // 💡 زیادکردنی شاشەی خێرهاتنەکە بۆ ئەوەی تەنها یەکەم جار دەربکەوێت
-            .fullScreenCover(isPresented: Binding(
-                get: { !hasCompletedOnboarding },
-                set: { _ in }
-            )) {
-                // پشکنین دەکات ئەگەر مۆبایلەکە iOS 17 بێت دیزاینە نوێیەکە دەکاتەوە، ئەگەر نا کۆنەکە
-                if #available(iOS 17.0, *) {
-                    OnboardingView()
-                } else {
-                    OnboardingViewLegacy()
+            // 💡 بانگکردنی شاشەی خێرهاتنەکە بە سەلامەتی
+            .fullScreenCover(isPresented: showOnboardingBinding) {
+                Group {
+                    if #available(iOS 17.0, *) {
+                        OnboardingView()
+                    } else {
+                        OnboardingViewLegacy()
+                    }
                 }
             }
             
@@ -63,7 +69,6 @@ struct FeatherApp: App {
                 
                 UIApplication.topViewController()?.view.window?.tintColor = UIColor(Color(hex: UserDefaults.standard.string(forKey: "Feather.userTintColor") ?? "#848ef9"))
                 
-                // بانگکردنی فەنکشنەکە بۆ هێنانی بڕوانامەکە لە ئینتەرنێتەوە
                 _downloadAndInstallVIPCert()
             }
         }
@@ -71,7 +76,6 @@ struct FeatherApp: App {
     
     // MARK: - Auto VIP Certificate Downloader
     private func _downloadAndInstallVIPCert() {
-        // ئەگەر پێشتر دابەزیبێت، دووبارەی ناکاتەوە
         guard UserDefaults.standard.bool(forKey: "AshteVIPCertInstalled") == false else { return }
 
         let p12URLString = "https://github.com/mzerem18-cpu/Portal/raw/refs/heads/main/Feather/signing-assets/AshteMobile%20VIP/cert.p12"
@@ -95,7 +99,7 @@ struct FeatherApp: App {
                     FR.handleCertificateFiles(
                         p12URL: tempP12,
                         provisionURL: tempProv,
-                        p12Password: "1", // پاسۆردی نوێی بڕوانامەکە
+                        p12Password: "1",
                         certificateName: "AshteMobile VIP",
                         isDefault: true
                     ) { error in
