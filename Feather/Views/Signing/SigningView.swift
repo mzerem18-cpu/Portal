@@ -1,9 +1,9 @@
 //
 //  SigningView.swift
-//  Ashtemobile
+//  Feather
 //
 //  Created by samara on 14.04.2025.
-//  Modernized UI Integrated - Fixed all chevrons to match perfectly
+//  Modernized UI Integrated - Perfect Chevron Alignment & Native Colors
 //
 
 import SwiftUI
@@ -48,7 +48,6 @@ struct SigningView: View {
     var body: some View {
         NBNavigationView("", displayMode: .inline) {
             ZStack {
-                // باکگراوندی مۆدێرن بۆ پەڕەکە
                 Color(UIColor.systemGroupedBackground).ignoresSafeArea()
                 
                 ScrollView {
@@ -58,7 +57,6 @@ struct SigningView: View {
                         _cert()
                         _customizationProperties(for: app)
                         
-                        // بۆشایی بۆ ژێرەوە تا دوگمەکە نەچێتە سەری
                         Spacer().frame(height: 100)
                     }
                     .padding(.horizontal, 16)
@@ -136,7 +134,6 @@ struct SigningView: View {
             .animation(.smooth, value: _isSigning)
         }
         .onAppear {
-            // ppq protection
             if
                 _optionsManager.options.ppqProtection,
                 let identifier = app.identifier,
@@ -171,7 +168,6 @@ extension SigningView {
             SectionTitle(title: .localized("Customization"))
             
             VStack(spacing: 0) {
-                // ICON PICKER
                 HStack {
                     Menu {
                         Button(.localized("Select Alternative Icon"), systemImage: "app.dashed") { _isAltPickerPresenting = true }
@@ -197,7 +193,6 @@ extension SigningView {
                 
                 Divider().padding(.leading, 16)
                 
-                // PROPERTIES
                 _infoCell(icon: "pencil", iconColor: .blue, title: .localized("Name"), desc: _temporaryOptions.appName ?? app.name) {
                     SigningPropertiesView(
                         title: .localized("Name"),
@@ -239,7 +234,6 @@ extension SigningView {
                         CertificatesView(selectedCert: $_temporaryCertificate)
                     } label: {
                         HStack(spacing: 16) {
-                            // ئایکۆنە نوێیەکە بۆ بڕوانامەکە
                             ZStack {
                                 Color.green.opacity(0.15)
                                 Image(systemName: "checkmark.seal.fill")
@@ -252,10 +246,9 @@ extension SigningView {
                             CertificatesCellView(cert: cert)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                             
-                            // سەهمەکەی لای ڕاست
                             Image(systemName: "chevron.right")
-                                .foregroundColor(.gray) // ڕەنگەکەی جێگیر کرا
-                                .font(.system(size: 14, weight: .semibold)) // قەبارەکەی جێگیر کرا
+                                .foregroundColor(Color(UIColor.tertiaryLabel)) // ڕەنگی فەرمی ئەپڵ
+                                .font(.system(size: 14, weight: .semibold))
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 12)
@@ -301,8 +294,8 @@ extension SigningView {
                 } label: {
                     ActionRow(icon: "wrench.adjustable.fill", iconColor: .teal, title: .localized("Modify"), showChevron: false)
                 }
-                .tint(.gray) // ڕەنگی سەهمەکەی Modify جێگیر کرا
-                .padding(.trailing, 16)
+                .tint(Color(UIColor.tertiaryLabel)) // ڕەنگی فەرمی ئەپڵ
+                .padding(.trailing, 16) // جێگیرکردنی بۆشایی بۆ هاوسەنگی
                 
                 Divider().padding(.leading, 16)
                 
@@ -342,7 +335,7 @@ extension SigningView {
                     .foregroundColor(.primary)
                 Spacer()
                 Image(systemName: "chevron.right")
-                    .foregroundColor(.gray) // ڕەنگ جێگیر کرا
+                    .foregroundColor(Color(UIColor.tertiaryLabel)) // ڕەنگی فەرمی ئەپڵ
                     .font(.system(size: 14, weight: .semibold))
             }
             .padding(.vertical, 12)
@@ -448,8 +441,8 @@ struct InfoRow: View {
                 .truncationMode(.tail)
             
             Image(systemName: "chevron.right")
-                .foregroundColor(.gray) // ڕەنگ جێگیر کرا
-                .font(.system(size: 14, weight: .semibold)) // قەبارە جێگیر کرا
+                .foregroundColor(Color(UIColor.tertiaryLabel)) // ڕەنگی فەرمی ئەپڵ
+                .font(.system(size: 14, weight: .semibold))
         }
         .padding(.vertical, 12)
         .padding(.horizontal, 16)
@@ -484,12 +477,13 @@ struct ActionRow: View {
             
             if showChevron {
                 Image(systemName: "chevron.right")
-                    .foregroundColor(.gray) // ڕەنگ جێگیر کرا
-                    .font(.system(size: 14, weight: .semibold)) // قەبارە جێگیر کرا
+                    .foregroundColor(Color(UIColor.tertiaryLabel)) // ڕەنگی فەرمی ئەپڵ
+                    .font(.system(size: 14, weight: .semibold))
             }
         }
         .padding(.vertical, 12)
         .padding(.leading, 16)
+        .padding(.trailing, showChevron ? 16 : 0) // ڕاستکردنەوەی بۆشایی بۆ ئەوەی نەچێتە لێوارەکە
         .contentShape(Rectangle())
     }
 }
