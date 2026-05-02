@@ -1,5 +1,3 @@
-ئه مه كوده كه مه هي منه
-
 //
 //  FeatherApp.swift
 //  Feather
