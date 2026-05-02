@@ -1,9 +1,9 @@
 //
 //  SigningView.swift
-//  Ashtemobile
+//  Feather
 //
 //  Created by samara on 14.04.2025.
-//  Modernized UI Integrated
+//  Modernized UI Integrated - Fixed alignment and chevrons
 //
 
 import SwiftUI
@@ -238,9 +238,27 @@ extension SigningView {
                     NavigationLink {
                         CertificatesView(selectedCert: $_temporaryCertificate)
                     } label: {
-                        CertificatesCellView(cert: cert)
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
+                        HStack(spacing: 16) {
+                            // ئایکۆنە نوێیەکە بۆ بڕوانامەکە
+                            ZStack {
+                                Color.green.opacity(0.15)
+                                Image(systemName: "checkmark.seal.fill")
+                                    .foregroundColor(.green)
+                                    .font(.system(size: 20, weight: .semibold))
+                            }
+                            .frame(width: 45, height: 45)
+                            .cornerRadius(12)
+                            
+                            CertificatesCellView(cert: cert)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            
+                            // سەهمەکەی لای ڕاست
+                            Image(systemName: "chevron.right")
+                                .foregroundColor(.gray.opacity(0.5))
+                                .font(.system(size: 14, weight: .bold))
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 12)
                     }
                     .buttonStyle(PlainButtonStyle())
                 } else {
@@ -283,7 +301,7 @@ extension SigningView {
                 } label: {
                     ActionRow(icon: "wrench.adjustable.fill", iconColor: .teal, title: .localized("Modify"), showChevron: false)
                 }
-                .tint(.gray)
+                .tint(Color.gray.opacity(0.5)) // ڕەنگی سەهمەکەی Modify گۆڕدرا بۆ هاوسەنگی
                 .padding(.trailing, 16)
                 
                 Divider().padding(.leading, 16)
@@ -324,8 +342,8 @@ extension SigningView {
                     .foregroundColor(.primary)
                 Spacer()
                 Image(systemName: "chevron.right")
-                    .foregroundColor(.gray.opacity(0.3))
-                    .font(.system(size: 12, weight: .bold))
+                    .foregroundColor(.gray.opacity(0.5))
+                    .font(.system(size: 14, weight: .bold))
             }
             .padding(.vertical, 12)
             .padding(.horizontal, 16)
@@ -430,8 +448,8 @@ struct InfoRow: View {
                 .truncationMode(.tail)
             
             Image(systemName: "chevron.right")
-                .foregroundColor(.gray.opacity(0.3))
-                .font(.system(size: 12, weight: .bold))
+                .foregroundColor(.gray.opacity(0.5)) // ڕەنگی سەهم تۆختر کرا
+                .font(.system(size: 14, weight: .bold)) // قەبارەی سەهم گەورەتر کرا
         }
         .padding(.vertical, 12)
         .padding(.horizontal, 16)
@@ -466,8 +484,8 @@ struct ActionRow: View {
             
             if showChevron {
                 Image(systemName: "chevron.right")
-                    .foregroundColor(.gray.opacity(0.3))
-                    .font(.system(size: 12, weight: .bold))
+                    .foregroundColor(.gray.opacity(0.5)) // ڕەنگی سەهم تۆختر کرا
+                    .font(.system(size: 14, weight: .bold)) // قەبارەی سەهم گەورەتر کرا
             }
         }
         .padding(.vertical, 12)
